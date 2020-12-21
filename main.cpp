@@ -34,10 +34,12 @@ std::string getRelevantString(const std::string str) {
 }
 
 int main() {
-    std::string a;
-    std::cin >> a;
+    std::string a, b, c;
+    std::cin >> a >> b >> c;
 
-    std::cout << getRelevantString(a) << std::endl;
+    std::string input = a.append(" ").append(b).append(" ").append(c);
+
+    std::cout << getRelevantString(input) << std::endl;
 
     return 0;
 }
