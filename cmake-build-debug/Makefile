@@ -111,6 +111,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named minimum-string
+
+# Build rule for target.
+minimum-string: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 minimum-string
+.PHONY : minimum-string
+
+# fast build rule for target.
+minimum-string/fast:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/build
+.PHONY : minimum-string/fast
+
+#=============================================================================
 # Target rules for targets named coursera
 
 # Build rule for target.
@@ -150,6 +163,33 @@ main.cpp.s:
 	$(MAKE) -f CMakeFiles/coursera.dir/build.make CMakeFiles/coursera.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+minimum-string/main.o: minimum-string/main.cpp.o
+
+.PHONY : minimum-string/main.o
+
+# target to build an object file
+minimum-string/main.cpp.o:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/minimum-string/main.cpp.o
+.PHONY : minimum-string/main.cpp.o
+
+minimum-string/main.i: minimum-string/main.cpp.i
+
+.PHONY : minimum-string/main.i
+
+# target to preprocess a source file
+minimum-string/main.cpp.i:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/minimum-string/main.cpp.i
+.PHONY : minimum-string/main.cpp.i
+
+minimum-string/main.s: minimum-string/main.cpp.s
+
+.PHONY : minimum-string/main.s
+
+# target to generate assembly for a file
+minimum-string/main.cpp.s:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/minimum-string/main.cpp.s
+.PHONY : minimum-string/main.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -158,10 +198,14 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... minimum-string"
 	@echo "... coursera"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... minimum-string/main.o"
+	@echo "... minimum-string/main.i"
+	@echo "... minimum-string/main.s"
 .PHONY : help
 
 

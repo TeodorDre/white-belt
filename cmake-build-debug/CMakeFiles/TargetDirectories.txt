@@ -1,3 +1,4 @@
 /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles/rebuild_cache.dir
 /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles/minimum-string.dir
 /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles/coursera.dir

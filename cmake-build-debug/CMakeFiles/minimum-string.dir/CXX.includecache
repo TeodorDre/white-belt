@@ -6,9 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/Users/teodordre/Documents/reps/C++/coursera/main.cpp
+/Users/teodordre/Documents/reps/C++/coursera/minimum-string/main.cpp
+iostream
+-
+string
+-
 cmath
 -
-iostream
-/Users/teodordre/Documents/reps/C++/coursera/iostream
+vector
+-
 

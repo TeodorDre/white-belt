@@ -53,6 +53,7 @@ CMAKE_BINARY_DIR = /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debu
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/minimum-string.dir/all
 all: CMakeFiles/coursera.dir/all
 
 .PHONY : all
@@ -63,9 +64,37 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/minimum-string.dir/clean
 clean: CMakeFiles/coursera.dir/clean
 
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/minimum-string.dir
+
+# All Build rule for target.
+CMakeFiles/minimum-string.dir/all:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/depend
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target minimum-string"
+.PHONY : CMakeFiles/minimum-string.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/minimum-string.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles 2
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/minimum-string.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/teodordre/Documents/reps/C++/coursera/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/minimum-string.dir/rule
+
+# Convenience name for target.
+minimum-string: CMakeFiles/minimum-string.dir/rule
+
+.PHONY : minimum-string
+
+# clean rule for target.
+CMakeFiles/minimum-string.dir/clean:
+	$(MAKE) -f CMakeFiles/minimum-string.dir/build.make CMakeFiles/minimum-string.dir/clean
+.PHONY : CMakeFiles/minimum-string.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/coursera.dir

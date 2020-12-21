@@ -1,45 +1,23 @@
-#include <iostream>
-#include <string>
 #include <cmath>
-#include <vector>
+#include "iostream"
 
-std::string getRelevantString(const std::string str) {
-    std::string delim = " ";
+void to_sqrt(const int a, const int b, const int c) {
+    double d = b * b - 4 * a * c;
 
-    auto start = 0U;
-    auto end = str.find(delim);
+    double x1 = ((b * -1) - sqrt(d)) / (a * c);
+    double x2 = ((b * -1) + sqrt(d)) / (a * c);
 
-    std::vector<std::string> entries;
-
-    while (end != std::string::npos) {
-        std::string result = str.substr(start, end - start);
-        entries.push_back(result);
-
-        start = end + delim.length();
-        end = str.find(delim, start);
-    }
-
-    std::string result = str.substr(start, end - start);
-    entries.push_back(result);
-
-    std::string minimum = entries.front();
-
-    for (const auto &entry : entries) {
-        if (minimum > entry) {
-            minimum = entry;
-        }
-    }
-
-    return minimum;
+    std::cout << x2 << " " << x1;
 }
 
 int main() {
-    std::string a, b, c;
-    std::cin >> a >> b >> c;
+    int a, b, c;
 
-    std::string input = a.append(" ").append(b).append(" ").append(c);
+    std::cin >> a;
+    std::cin >> b;
+    std::cin >> c;
 
-    std::cout << getRelevantString(input) << std::endl;
+    to_sqrt(a, b, c);
 
     return 0;
 }
