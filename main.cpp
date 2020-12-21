@@ -22,17 +22,22 @@ std::string getRelevantString(const std::string str) {
     std::string result = str.substr(start, end - start);
     entries.push_back(result);
 
-    for (int i = 0; i <= entries.size(); i++) {
-        std::cout << entries[i] << std::endl;
+    std::string minimum = entries.front();
+
+    for (const auto &entry : entries) {
+        if (minimum > entry) {
+            minimum = entry;
+        }
     }
 
-    return str;
+    return minimum;
 }
 
 int main() {
-    std::string a = "milk milkshake month";
+    std::string a;
+    std::cin >> a;
 
-    getRelevantString(a);
+    std::cout << getRelevantString(a) << std::endl;
 
     return 0;
 }
