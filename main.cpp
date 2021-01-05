@@ -1,5 +1,5 @@
 //
-// Created by Andrew Slesarenko on 31/12/2020.
+// Created by Andrew Slesarenko on 05/01/2021.
 //
 
 #include "iostream"
@@ -7,16 +7,24 @@
 
 using namespace std;
 
-vector<int> Reversed(const vector<int>& v) {
-    vector<int> result = {};
+int main() {
+    int days_count;
+    cin >> days_count;
 
-    result.reserve(v.size());
+    vector<int> day_degrees;
 
-    for (int i = v.size() - 1; i >= 0; i--) {
-        int entry = v[i];
+    while (days_count > 0) {
+        int degree;
+        cin >> degree;
 
-        result.push_back(entry);
+        day_degrees.push_back(degree);
+
+        days_count--;
     }
 
-    return result;
-};
+    for (auto& degree: day_degrees) {
+        std::cout << degree;
+    }
+
+    return 0;
+}
