@@ -7,10 +7,22 @@
 
 using namespace std;
 
-vector<int> days_in_month = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-
-void AddTask(const int &day_number, const string& task_name, vector<vector<string>> timetable) {
+void AddTask(const int &day_number, const string& task_name, vector<vector<string>>& timetable) {
     timetable[day_number].push_back(task_name);
+}
+
+void DumpDay(const int &day_number, vector<vector<string>>& timetable) {
+    const vector<string>& day_tasks = timetable[day_number];
+
+    cout << day_number << " ";
+
+    for (const auto& i : day_tasks) {
+        cout << i << " ";
+    }
+}
+
+void OpenNextMonth(vector<vector<string>>& timetable) {
+
 }
 
 int main() {
@@ -21,15 +33,26 @@ int main() {
 
     for (int i = 0; i < operations_n; i++) {
         string operation_type;
-        string task_name;
-
         int day_number;
 
         cin >> operation_type;
-        cin >> day_number;
-        cin >> task_name;
+
+        if (operation_type == "NEXT") {
+            OpenNextMonth(timetable);
+        }
+
+        if (operation_type == "DUMP" || operation_type == "ADD") {
+            cin >> day_number;
+        }
+
+        if (operation_type == "DUMP") {
+            DumpDay(day_number, timetable);
+        }
 
         if (operation_type == "ADD") {
+            string task_name;
+            cin >> task_name;
+
             AddTask(day_number, task_name, timetable);
         }
     }
