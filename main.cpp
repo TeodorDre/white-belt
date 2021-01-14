@@ -1,105 +1,77 @@
+
 //
-// Created by Andrew Slesarenko on 11/01/2021.
+// Created by Andrew Slesarenko on 15/01/2021.
 //
 
 #include "iostream"
-#include "string"
 #include "map"
+#include "string"
+#include "vector"
 
 using namespace std;
 
-void ChangeCapital(const string& country_name, const string& new_capital, map<string, string>& dict) {
-    if (dict.count(country_name) == 1 && dict[country_name] == new_capital) {
-        cout << "Country " + country_name << " hasn't changed its capital" << endl;
-        return;
-    }
+void PrintAllBuses() {
 
-    if (dict.count(country_name) == 0) {
-        dict[country_name] = new_capital;
-
-        cout << "Introduce new country " + country_name << " with capital " << new_capital << endl;
-        return;
-    }
-
-    if (dict.count(country_name) == 1 && dict[country_name] != new_capital) {
-        cout << "Country " + country_name << " has changed its capital from " << dict[country_name] << " to " << new_capital << endl;
-        dict[country_name] = new_capital;
-    }
 }
 
-void RenameCountry(const string& old_country_name, const string& new_country_name, map<string, string>& dict) {
-    if (old_country_name == new_country_name || dict.count(new_country_name) == 1 || dict.count(old_country_name) == 0) {
-        cout << "Incorrect rename, skip" << endl;
-        return;
-    }
+void PrintBusesForStop(const string& bus_stop) {
 
-    if (dict.count(old_country_name) == 1) {
-        dict[new_country_name] = dict[old_country_name];
-        dict.erase(old_country_name);
-
-        cout << "Country " << old_country_name << " with capital " << dict[new_country_name] << " has been renamed to " << new_country_name << endl;
-    }
 }
 
-void PrintCountryInfo(const string& country_name, map<string, string>& dict) {
-    if (dict.count(country_name) == 0) {
-        cout << "Country " << country_name << " doesn't exist" << endl;
-    } else {
-        cout << "Country " << country_name << " has capital " << dict[country_name] << endl;
-    }
+void PrintStopsForBus(const string& bus_name) {
+
 }
 
-void Dump(map<string, string>& dict) {
-    if (dict.empty()) {
-        cout << "There are no countries in the world" << endl;
-        return;
-    }
+void AddNewBusStops(const string& bus_name, const vector<string>& stops) {}
 
-    for (const auto& [key, value] : dict) {
-        cout << key << "/" << value << " ";
-    }
+int main() {
+    string NEW_BUSES = "NEW_BUSES";
+    string BUSES_FOR_STOP = "BUSES_FOR_STOP";
+    string STOPS_FOR_BUS = "STOPS_FOR_BUS";
+    string ALL_BUSES = "ALL_BUSES";
 
-    cout << endl;
-}
-
-int main () {
     int operations_n;
-
-    const string CHANGE_COMMAND = "CHANGE_CAPITAL";
-    const string RENAME_COMMAND = "RENAME";
-
-    const string ABOUT_COMMAND = "ABOUT";
-    const string DUMP_COMMAND = "DUMP";
 
     cin >> operations_n;
 
-    map<string, string> dict;
-
     for (int i = 0; i < operations_n; i++) {
-        string a;
-        string b;
-        string c;
+        string command;
 
-        cin >> a;
+        if (command == ALL_BUSES) {
+            PrintAllBuses();
+        } else if (command == BUSES_FOR_STOP) {
+            string bus_stop;
 
-        if (a == CHANGE_COMMAND) {
-            cin >> b;
-            cin >> c;
+            cin >> bus_stop;
 
-            ChangeCapital(b, c, dict);
-        } else if (a == RENAME_COMMAND) {
-            cin >> b;
-            cin >> c;
+            PrintBusesForStop(bus_stop);
+        } else if (command == STOPS_FOR_BUS) {
+            string bus_name;
 
-            RenameCountry(b, c, dict);
-        } else if (a == ABOUT_COMMAND) {
-            cin >> b;
+            cin >> bus_name;
 
-            PrintCountryInfo(b, dict);
-        } else if (a == DUMP_COMMAND) {
-            Dump(dict);
+            PrintStopsForBus(bus_name);
+        } else if (command == NEW_BUSES) {
+            string bus_name;
+            int stop_count;
+
+            cin >> bus_name;
+            cin >> stop_count;
+
+            vector<string> stops;
+
+            for (int z = 0; i < stop_count; z++) {
+                string stop_name;
+
+                cin >> stop_name;
+
+                stops.push_back(stop_name);
+            }
+
+            AddNewBusStops(bus_name, stops);
         }
     }
+
 
     return 0;
 }
