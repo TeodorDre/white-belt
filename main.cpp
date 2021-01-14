@@ -10,19 +10,27 @@
 
 using namespace std;
 
-void PrintAllBuses() {
+void PrintAllBuses(const map<string, vector<string>>& bus_and_stops) {
+    if (bus_and_stops.empty()) {
+        cout << "No buses" << endl;
+        return;
+    }
+}
+
+void PrintBusesForStop(const string& bus_stop, const map<string, vector<string>>& bus_and_stops) {
 
 }
 
-void PrintBusesForStop(const string& bus_stop) {
-
+void PrintStopsForBus(const string& bus_name, const map<string, vector<string>>& bus_and_stops) {
+    if (bus_and_stops.count(bus_name) == 0) {
+        cout << "No bus" << endl;
+        return;
+    }
 }
 
-void PrintStopsForBus(const string& bus_name) {
+void AddNewBusStops(const string& bus_name, const vector<string>& stops,  map<string, vector<string>>& bus_and_stops) {
 
 }
-
-void AddNewBusStops(const string& bus_name, const vector<string>& stops) {}
 
 int main() {
     string NEW_BUSES = "NEW_BUSES";
@@ -34,23 +42,25 @@ int main() {
 
     cin >> operations_n;
 
+    map<string, vector<string>> bus_and_stops;
+
     for (int i = 0; i < operations_n; i++) {
         string command;
 
         if (command == ALL_BUSES) {
-            PrintAllBuses();
+            PrintAllBuses(bus_and_stops);
         } else if (command == BUSES_FOR_STOP) {
             string bus_stop;
 
             cin >> bus_stop;
 
-            PrintBusesForStop(bus_stop);
+            PrintBusesForStop(bus_stop, bus_and_stops);
         } else if (command == STOPS_FOR_BUS) {
             string bus_name;
 
             cin >> bus_name;
 
-            PrintStopsForBus(bus_name);
+            PrintStopsForBus(bus_name, bus_and_stops);
         } else if (command == NEW_BUSES) {
             string bus_name;
             int stop_count;
@@ -68,7 +78,7 @@ int main() {
                 stops.push_back(stop_name);
             }
 
-            AddNewBusStops(bus_name, stops);
+            AddNewBusStops(bus_name, stops, bus_and_stops);
         }
     }
 
