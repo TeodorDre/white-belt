@@ -7,6 +7,7 @@
 #include "map"
 #include "string"
 #include "vector"
+#include <algorithm>
 
 using namespace std;
 
@@ -61,9 +62,23 @@ void PrintStopsForBus(const string& bus_name, const map<string, vector<string>>&
     }
 
     for (const auto& [bus, stops]: bus_and_stops) {
-        if (bus != bus_name) {
+        if (bus == bus_name) {
             for (const auto &stop: stops) {
-                stops_and_buses[stop].push_back(bus);
+                for (const auto& [bus1, stops1]: bus_and_stops) {
+                    for (const auto &stop1: stops1) {
+                        if (stop1 == stop) {
+                          vector<string>& v = stops_and_buses[stop];
+
+                          if (std::find(v.begin(), v.end(), bus1) != v.end()) {
+                              //
+                          } else {
+                            if (bus1 != bus_name) {
+                                stops_and_buses[stop].push_back(bus1);
+                            }
+                          }
+                        }
+                    }
+                }
             }
         }
     }
@@ -72,13 +87,12 @@ void PrintStopsForBus(const string& bus_name, const map<string, vector<string>>&
         cout << "Stop " << stop << ": ";
 
         if (buses.empty()) {
-            cout << "no interchange" << endl;
+            cout << "no interchange";
         } else {
             for (const auto& bus: buses) {
                 cout << bus << " ";
             }
         }
-
 
         cout << endl;
     }
