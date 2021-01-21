@@ -15,15 +15,27 @@ void PrintAllBuses(const map<string, vector<string>>& bus_and_stops) {
         cout << "No buses" << endl;
         return;
     }
+
+    for (const auto& [bus, stops]: bus_and_stops) {
+        cout << "Bus " << bus << ": ";
+
+        for (const auto& stop: stops) {
+            cout << stop << " ";
+        }
+
+        cout << endl;
+    }
+
+    cout << endl;
 }
 
 void PrintBusesForStop(const string& bus_stop, const map<string, vector<string>>& bus_and_stops) {
     vector<string> buses;
 
-    for (const auto& [key, value]: bus_and_stops) {
-        for (const auto& stop: value) {
+    for (const auto& [bus, stops]: bus_and_stops) {
+        for (const auto& stop: stops) {
             if (stop == bus_stop) {
-                buses.push_back(key);
+                buses.push_back(bus);
                 continue;
             }
         }
@@ -41,9 +53,34 @@ void PrintBusesForStop(const string& bus_stop, const map<string, vector<string>>
 }
 
 void PrintStopsForBus(const string& bus_name, const map<string, vector<string>>& bus_and_stops) {
+    map<string, vector<string>> stops_and_buses;
+
     if (bus_and_stops.count(bus_name) == 0) {
         cout << "No bus" << endl;
         return;
+    }
+
+    for (const auto& [bus, stops]: bus_and_stops) {
+        if (bus != bus_name) {
+            for (const auto &stop: stops) {
+                stops_and_buses[stop].push_back(bus);
+            }
+        }
+    }
+
+    for (const auto& [stop, buses]: stops_and_buses) {
+        cout << "Stop " << stop << ": ";
+
+        if (buses.empty()) {
+            cout << "no interchange" << endl;
+        } else {
+            for (const auto& bus: buses) {
+                cout << bus << " ";
+            }
+        }
+
+
+        cout << endl;
     }
 }
 
@@ -51,12 +88,6 @@ void AddNewBusStops(const string& bus_name, const vector<string>& stops, map<str
     for (const auto& stop: stops) {
         bus_and_stops[bus_name].push_back(stop);
     }
-
-    for (const auto& stop : bus_and_stops[bus_name]) {
-        cout << stop << " ";
-    }
-
-    cout << endl;
 }
 
 int main() {
