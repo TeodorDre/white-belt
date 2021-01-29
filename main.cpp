@@ -1,80 +1,47 @@
 //
-// Created by Andrew Slesarenko on 22/01/2021.
+// Created by Andrew Slesarenko on 29/01/2021.
 //
 
-#include "string"
-#include "set"
-#include "map"
 #include "iostream"
+#include "map"
+#include "set"
 
 using namespace std;
 
-using Synonyms = map<string, set<string>>;
+void AddBusRoute(const set<string>& buses, map<set<string>, int>& routes) {
+    if (routes.count(buses) == 1) {
+        cout << "Already exists for " << routes[buses] + 1 << endl;
+    } else {
+        int routes_size = routes.size();
 
-void Add(const string &word1, const string &word2, Synonyms &dict) {
-    set<string> words;
+        routes[buses] = routes_size;
 
-    words.insert(word1);
-    words.insert(word2);
-
-    dict[word1] = words;
-    dict[word2] = words;
-}
-
-void Count(const string &word, const Synonyms &dict) {
-    int synonyms = 0;
-
-    for (const auto&[key, value] : dict) {
-        if (value.count(word) == 1) {
-            synonyms++;
-        }
+        cout << "New bus " << routes.size() << endl;
     }
-
-    cout << synonyms << endl;
-}
-
-void Check(const string &word1, const string &word2, const Synonyms  &dict) {
-    bool result = false;
-
-    string text = result ? "YES" : "NO";
-
-    cout << text << endl;
 }
 
 int main() {
     int operations_n;
 
+    map<set<string>, int> routes;
+
     cin >> operations_n;
 
-    Synonyms dict;
-
     for (int i = 0; i < operations_n; i++) {
-        string command;
+        int stop_count;
+        cin >> stop_count;
 
-        cin >> command;
+        set<string> buses;
 
-        if (command == "ADD") {
-            string word1;
-            string word2;
+        for (int z = 0; z < stop_count; z++) {
+            string bus;
 
-            cin >> word1;
-            cin >> word2;
+            cin >> bus;
 
-            Add(word1, word2, dict);
-        } else if (command == "COUNT") {
-            string word;
-            cin >> word;
-
-            Count(word, dict);
-        } else if (command == "CHECK") {
-            string word1;
-            string word2;
-
-            cin >> word1;
-            cin >> word2;
-
-            Check(word1, word2, dict);
+            buses.insert(bus);
         }
+
+        AddBusRoute(buses, routes);
     }
 
     return 0;
