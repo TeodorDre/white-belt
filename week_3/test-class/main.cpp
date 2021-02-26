@@ -1,0 +1,20 @@
+//
+// Created by Andrew Slesarenko on 17/02/2021.
+//
+
+class Incognizable {
+public:
+    Incognizable() {};
+
+    Incognizable(const int a) {};
+
+    Incognizable(const int a, const int b) {};
+};
+
+int main() {
+    Incognizable a;
+    Incognizable b = {};
+    Incognizable c = {0};
+    Incognizable d = {0, 1};
+    return 0;
+}
