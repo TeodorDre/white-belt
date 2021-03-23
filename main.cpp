@@ -13,58 +13,44 @@ using namespace std;
 int main() {
     ifstream input("input.txt");
 
-    if (input) {
-        string rows;
-        string columns;
+    if (!input) {
+        return 0;
+    }
 
-        vector<char> values;
+    string rows;
+    string columns;
 
-        getline(input, rows, ' ');
-        getline(input, columns);
+    vector<int> values;
 
-        string curr_value;
+    getline(input, rows, ' ');
+    getline(input, columns);
 
-        while (getline(input, curr_value)) {
-            for (const char &i: curr_value) {
-                if (i != ',') {
-                    values.push_back(i);
-                }
+    int int_rows = stoi(rows);
+    int int_columns = stoi(columns);
+
+    if (int_rows == 0) {
+        return 0;
+    }
+
+    cout << setfill(' ');
+
+    for (int row = 0; row < int_rows; row++) {
+        for (int column = 0; column < int_columns; column++) {
+            int value;
+
+            input >> value;
+            input.ignore(1);
+
+            cout << right << setw(10);
+            cout << value;
+
+            if (column != int_columns - 1) {
+                cout << " ";
             }
         }
 
-        int curr_index = 0;
-
-        vector<vector<char>> rows_values(stoi(rows));
-
-        for (const auto &i: values) {
-            rows_values[curr_index].push_back(i);
-
-            if (rows_values[curr_index].size() == stoi(columns)) {
-                curr_index += 1;
-            }
-        }
-
-        int curr_row_index = 0;
-
-        for (const vector<char>& row_value: rows_values) {
-            int value_index = 0;
-
-            for (const auto &i: row_value) {
-                cout << setw(10);
-
-                value_index += 1;
-                cout << " " << i;
-
-                if (row_value.size() != value_index) {
-                    cout << " ";
-                }
-            }
-
-            curr_row_index += 1;
-
-            if (rows_values.size() != curr_row_index) {
-                cout << endl;
-            }
+        if (row != int_rows - 1) {
+            cout << endl;
         }
     }
 
