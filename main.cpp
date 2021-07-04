@@ -1,75 +1,202 @@
 #include <iostream>
-#include <numeric>
-#include <math.h>
+#include <sstream>
+#include <vector>
+#include <set>
+#include <map>
+#include <exception>
 
 using namespace std;
 
-bool IsNegative(int num) {
-    return num < 0;
-}
+int Divider(const int &n, const int &d) {
+    if (n == d) {
+        return n;
+    } else if (n == 0) {
+        return n;
+    } else {
+        int dividend_t = 0;
+        int divider_t = 0;
+        int reminder = 0;
 
-bool isPositive(int num) {
-    return !IsNegative(num);
-}
-
-int FindGreatestCommonDivisor(int a, int b) {
-    cin >> a >> b;
-
-    while (a > 0 && b > 0) {
-        if (a > b) {
-            a = a % b;
+        if (n > d) {
+            dividend_t = n;
+            divider_t = d;
         } else {
-            b = b % a;
+            dividend_t = d;
+            divider_t = n;
+        }
+
+        reminder = dividend_t % divider_t;
+
+        while (reminder != 0) {
+            dividend_t = divider_t;
+            divider_t = reminder;
+            reminder = dividend_t % divider_t;
+        }
+
+        if (divider_t < 0) {
+            return -divider_t;
+        } else {
+            return divider_t;
         }
     }
-
-    return a + b;
 }
+
 
 class Rational {
 public:
     Rational() {
-        _numerator = 0;
-        _denominator = 1;
+        p = 0;
+        q = 1;
     }
 
     Rational(int numerator, int denominator) {
-        int common_divisor = gcd(numerator, denominator);
-
-        if (numerator == 0) {
-            _numerator = 0;
-            _denominator = 1;
-            return;
+        if (denominator == 0) {
+            throw invalid_argument("Invalid argument");
+        } else {
+            Initialize(numerator, denominator);
         }
+    }
 
-        if (IsNegative(numerator)) {
-            denominator = abs(denominator);
+    void Initialize(const int &n, const int &d) {
+        p = n;
+        q = d;
+
+        SignedFactional();
+    }
+
+    void SignedFactional() {
+        if (p == 0) {
+            q = 1;
+        } else {
+            if (q < 0) {
+                p = -p;
+                q = -q;
+            }
+
+            int divider = Divider(p, q);
+
+            p /= divider;
+            q /= divider;
         }
-
-        if (common_divisor == numerator || common_divisor == denominator) {
-            _numerator = numerator;
-            _denominator = denominator;
-            return;
-        }
-
-        _numerator = numerator / common_divisor;
-        _denominator = denominator / common_divisor;
-
-        cout << _numerator << "/" << _denominator << endl;
     }
 
     int Numerator() const {
-        return _numerator;
+        return p;
     }
 
     int Denominator() const {
-        return _denominator;
+        return q;
+    }
+
+    const bool operator==(const Rational &a) const {
+        if ((a.p == p)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const bool operator>(const Rational &a) const {
+        if ((p * a.q) > (q * a.p)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    const bool operator<(const Rational &a) const {
+        if ((p * a.q) < (q * a.p)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    Rational operator+(const Rational &x) {
+        Rational result;
+
+        if (x.q == q) {
+            result.p = x.p + p;
+            result.q = x.q;
+        } else {
+            result.p = (x.p * q) + (p * x.q);
+            result.q = x.q * q;
+        }
+
+        result.SignedFactional();
+
+        return result;
+    }
+
+    Rational operator-(const Rational &x) {
+        Rational result;
+
+        if (x.q == q) {
+            result.p = p - x.p;
+            result.q = x.q;
+        } else {
+            result.p = (p * x.q) - (x.p * q);
+            result.q = x.q * q;
+        }
+
+        result.SignedFactional();
+
+        return result;
     }
 
 private:
-    int _numerator;
-    int _denominator;
+    int p;
+    int q;
 };
+
+
+istream &operator>>(istream &stream, Rational &r) {
+    int p_t, q_t;
+
+    stream >> p_t;
+    stream.ignore(1);
+    stream >> q_t;
+
+    r.Initialize(p_t, q_t);
+
+    return stream;
+
+}
+
+
+ostream &operator<<(ostream &stream, const Rational &r) {
+    stream << r.Numerator() << '/' << r.Denominator();
+
+    return stream;
+}
+
+
+Rational operator*(const Rational &left, const Rational &right) {
+    Rational result;
+
+    result.Initialize(
+            (right.Numerator() * left.Numerator()),
+            (right.Denominator() * left.Denominator())
+    );
+
+    return result;
+}
+
+
+Rational operator/(const Rational &left, const Rational &right) {
+    if (right.Numerator() == 0) {
+        throw domain_error("Invalid argument");
+    } else {
+        Rational result;
+
+        result.Initialize(
+                (left.Numerator() * right.Denominator()),
+                (left.Denominator() * right.Numerator())
+        );
+
+        return result;
+    }
+}
 
 int main() {
     {
