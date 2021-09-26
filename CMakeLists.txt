@@ -3,4 +3,4 @@ project(coursera)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(coursera week_4/ValidateRational/main.cpp week_4/TimeServer/main.cpp main.cpp)
+add_executable(coursera main.cpp)
