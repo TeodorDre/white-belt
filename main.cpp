@@ -52,8 +52,7 @@ public:
         return to_string(GetYear()) + to_string(GetMonth()) + to_string(GetDay());
     }
 
-    bool operator <(const Date& date) const
-    {
+    bool operator<(const Date &date) const {
         return GetFullDate() < date.GetFullDate();
     }
 
@@ -132,7 +131,7 @@ private:
 public:
     void Add(Date &date, string &event);
 
-    void Remove();
+    void Remove(Date &date, string &event);
 
     void Find();
 
@@ -149,8 +148,18 @@ void Database::Add(Date &date, string &event) {
     event_list->second.insert(event);
 }
 
-void Database::Remove() {
-    //
+void Database::Remove(Date &date, string &event) {
+    bool has_event = !event.empty();
+
+    if (has_event) {
+        // process has event
+    } else {
+        if (records.count(date) != 0) {
+            auto record_date = records.find(date);
+
+            record_date->second.clear();
+        }
+    }
 }
 
 void Database::Find() {
@@ -158,11 +167,16 @@ void Database::Find() {
 }
 
 void Database::PrintAll() const {
-    for (const auto& record: records) {
-        const Date& date = record.first;
-        auto& events_set = record.second;
+    for (const auto &record: records) {
+        const Date &date = record.first;
+        auto &events_set = record.second;
 
-        for (const string& event: events_set) {
+        if (events_set.empty()) {
+            cout << "No record for date: " << date << endl;
+            return;
+        }
+
+        for (const string &event: events_set) {
             cout << date << " " << event << endl;
         }
     }
@@ -170,7 +184,7 @@ void Database::PrintAll() const {
 
 //#endregion
 
-void RunTests(Database &db, istream& stream) {
+void RunInputStreamTests(Database &db, istream &stream) {
     string command;
 
     while (getline(stream, command)) {
@@ -203,7 +217,7 @@ void RunTests(Database &db, istream& stream) {
         if (command_name_raw == COMMAND_ADD) {
             db.Add(date, event_name_raw);
         } else if (command_name_raw == COMMAND_DEL) {
-            db.Remove();
+            db.Remove(date, event_name_raw);
         } else if (command_name_raw == COMMAND_FIND) {
             db.Find();
         } else if (command_name_raw == COMMAND_PRINT) {
@@ -215,17 +229,22 @@ void RunTests(Database &db, istream& stream) {
     }
 }
 
+void RunCommand(stringstream &stream, string command) {
+    stream << command << endl;
+}
+
 int main() {
     Database db;
 
-    stringstream stringstream1;
-    stringstream1 << "Add 2012-5-5 Add_Tanya" << endl;
-    stringstream1 << "Add 2012-5-5 Add_Vika" << endl;
-    stringstream1 << " Add 2012-5-5 Add_Andrew" << endl;
-    stringstream1 << " Add 2012-5-5 Add_Natalya" << endl;
+    stringstream stream;
+    RunCommand(stream, "Add 2012-5-5 Add_Tanya");
+    RunCommand(stream, "Add 2012-5-5 Add_Vika");
+    RunCommand(stream, "Add 2012-5-5 Add_Andrew");
+    RunCommand(stream, "Add 2012-5-5 Add_Natalya");
+    RunCommand(stream, COMMAND_DEL + " 2012-5-5");
+    RunCommand(stream, COMMAND_PRINT);
 
-    RunTests(db, stringstream1);
-    db.PrintAll();
+    RunInputStreamTests(db, stream);
 
     return 0;
 }
