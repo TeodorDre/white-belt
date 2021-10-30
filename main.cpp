@@ -4,6 +4,8 @@
 
 #include "iostream"
 #include "sstream"
+#include "map"
+#include "set"
 
 using namespace std;
 
@@ -44,6 +46,15 @@ public:
 
     int GetDay() const {
         return this->day;
+    }
+
+    string GetFullDate() const {
+        return to_string(GetYear()) + to_string(GetMonth()) + to_string(GetDay());
+    }
+
+    bool operator <(const Date& date) const
+    {
+        return GetFullDate() < date.GetFullDate();
     }
 
     void static Validate(int y, int m, int d);
@@ -91,7 +102,7 @@ istream &operator>>(istream &stream, Date &date) {
 }
 
 ostream &operator<<(ostream &stream, const Date &date) {
-    stream << date.GetYear() << " " << date.GetMonth() << " " << date.GetDay();
+    stream << date.GetYear() << "-" << date.GetMonth() << "-" << date.GetDay();
 
     return stream;
 }
@@ -115,8 +126,11 @@ void Date::Validate(int y, int m, int d) {
 //#region DATABASE
 
 class Database {
+private:
+    map<Date, set<string>> records;
+
 public:
-    void Add();
+    void Add(Date &date, string &event);
 
     void Remove();
 
@@ -126,8 +140,13 @@ public:
 
 };
 
-void Database::Add() {
-    //
+void Database::Add(Date &date, string &event) {
+    if (records.count(date) == 0) {
+        records[date] = {};
+    }
+
+    auto event_list = records.find(date);
+    event_list->second.insert(event);
 }
 
 void Database::Remove() {
@@ -139,19 +158,22 @@ void Database::Find() {
 }
 
 void Database::PrintAll() const {
-    //
+    for (const auto& record: records) {
+        const Date& date = record.first;
+        auto& events_set = record.second;
+
+        for (const string& event: events_set) {
+            cout << date << " " << event << endl;
+        }
+    }
 }
 
 //#endregion
 
-void PrintDatabase(Database const &db) {
-    db.PrintAll();
-}
-
-void RunTests(Database &db) {
+void RunTests(Database &db, istream& stream) {
     string command;
 
-    while (getline(cin, command)) {
+    while (getline(stream, command)) {
         string command_name_raw;
         string date_raw;
         string event_name_raw;
@@ -179,7 +201,7 @@ void RunTests(Database &db) {
         command_stream >> event_name_raw;
 
         if (command_name_raw == COMMAND_ADD) {
-            db.Add();
+            db.Add(date, event_name_raw);
         } else if (command_name_raw == COMMAND_DEL) {
             db.Remove();
         } else if (command_name_raw == COMMAND_FIND) {
@@ -196,7 +218,14 @@ void RunTests(Database &db) {
 int main() {
     Database db;
 
-    RunTests(db);
+    stringstream stringstream1;
+    stringstream1 << "Add 2012-5-5 Add_Tanya" << endl;
+    stringstream1 << "Add 2012-5-5 Add_Vika" << endl;
+    stringstream1 << " Add 2012-5-5 Add_Andrew" << endl;
+    stringstream1 << " Add 2012-5-5 Add_Natalya" << endl;
+
+    RunTests(db, stringstream1);
+    db.PrintAll();
 
     return 0;
 }
