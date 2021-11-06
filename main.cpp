@@ -7,6 +7,7 @@
 #include "map"
 #include "set"
 #include "vector"
+#include "iomanip"
 #include "algorithm"
 
 using namespace std;
@@ -17,6 +18,19 @@ string COMMAND_ADD = "Add";
 string COMMAND_PRINT = "Print";
 
 //#region DATE
+
+void RunCommand(stringstream &stream, string command) {
+    stream << command << endl;
+}
+
+bool check_number(const string& str) {
+    for (char i : str) {
+        if (isdigit(i) == false) {
+            return false;
+        }
+        return true;
+    }
+}
 
 class Date {
 public:
@@ -208,14 +222,16 @@ void Database::PrintAll() const {
         }
 
         for (const string &event: events_set) {
-            cout << date << " " << event << endl;
+            cout << setw(4) << setfill('0') << date.GetYear() << '-'
+            << setw(2) << setfill('0') << date.GetMonth() << '-' << setw(2) << date.GetDay();
+            cout << " " << event << endl;
         }
     }
 }
 
 //#endregion
 
-void RunInputStreamTests(Database &db, istream &stream) {
+void ExecuteCommands(Database &db, istream &stream) {
     string command;
 
     while (getline(stream, command)) {
@@ -253,18 +269,17 @@ void RunInputStreamTests(Database &db, istream &stream) {
             db.Find(date);
         } else if (command_name_raw == COMMAND_PRINT) {
             db.PrintAll();
-        } else {
-            cout << "Unknown command: " << command_name_raw << endl;
-            continue;
         }
     }
 }
 
-void RunCommand(stringstream &stream, string command) {
-    stream << command << endl;
+void RunProduction(istream &stream) {
+    Database db;
+
+    ExecuteCommands(db, stream);
 }
 
-int main() {
+void RunInputStreamTests() {
     Database db;
 
     stringstream stream;
@@ -276,7 +291,13 @@ int main() {
     RunCommand(stream, "Del 1-2-3 event2");
     RunCommand(stream, "Del 1-2-3 event2");
 
-    RunInputStreamTests(db, stream);
+    string command;
+
+    ExecuteCommands(db, stream);
+}
+
+int main() {
+    RunProduction(cin);
 
     return 0;
 }
