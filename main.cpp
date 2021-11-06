@@ -6,6 +6,8 @@
 #include "sstream"
 #include "map"
 #include "set"
+#include "vector"
+#include "algorithm"
 
 using namespace std;
 
@@ -129,41 +131,71 @@ private:
     map<Date, set<string>> records;
 
 public:
-    void Add(Date &date, string &event);
+    void Add(const Date &date, string &event);
 
-    void Remove(Date &date, string &event);
+    void Remove(const Date &date, string &event);
 
-    void Find();
+    void Find(const Date &date);
 
     void PrintAll() const;
 
 };
 
-void Database::Add(Date &date, string &event) {
+void Database::Add(const Date &date, string &event) {
     if (records.count(date) == 0) {
         records[date] = {};
     }
 
     auto event_list = records.find(date);
-    event_list->second.insert(event);
+
+    if (event_list->second.count(event) == 0) {
+        event_list->second.insert(event);
+    }
 }
 
-void Database::Remove(Date &date, string &event) {
+void Database::Remove(const Date &date, string &event) {
     bool has_event = !event.empty();
 
     if (has_event) {
-        // process has event
+        if (records.count(date) != 0) {
+            auto record_date = records.find(date);
+
+            if (record_date->second.count(event) != 0) {
+                record_date->second.erase(event);
+                cout << "Deleted successfully" << endl;
+            } else {
+                cout << "Event not found" << endl;
+            }
+        } else {
+            cout << "Event not found" << endl;
+        }
     } else {
         if (records.count(date) != 0) {
             auto record_date = records.find(date);
 
+            int record_events_size = record_date->second.size();
+
             record_date->second.clear();
+            cout << "Deleted " << record_events_size << " events" << endl;
+            return;
         }
+
+        cout << "Event not found" << endl;
     }
 }
 
-void Database::Find() {
-    //
+void Database::Find(const Date &date) {
+    auto record_date = records.find(date);
+
+    if (records.empty()) {
+        return;
+    }
+
+    auto events_set = record_date->second;
+
+    for (const auto &event: events_set) {
+        cout << event << endl;
+    }
 }
 
 void Database::PrintAll() const {
@@ -172,8 +204,7 @@ void Database::PrintAll() const {
         auto &events_set = record.second;
 
         if (events_set.empty()) {
-            cout << "No record for date: " << date << endl;
-            return;
+            continue;
         }
 
         for (const string &event: events_set) {
@@ -219,7 +250,7 @@ void RunInputStreamTests(Database &db, istream &stream) {
         } else if (command_name_raw == COMMAND_DEL) {
             db.Remove(date, event_name_raw);
         } else if (command_name_raw == COMMAND_FIND) {
-            db.Find();
+            db.Find(date);
         } else if (command_name_raw == COMMAND_PRINT) {
             db.PrintAll();
         } else {
@@ -237,12 +268,13 @@ int main() {
     Database db;
 
     stringstream stream;
-    RunCommand(stream, "Add 2012-5-5 Add_Tanya");
-    RunCommand(stream, "Add 2012-5-5 Add_Vika");
-    RunCommand(stream, "Add 2012-5-5 Add_Andrew");
-    RunCommand(stream, "Add 2012-5-5 Add_Natalya");
-    RunCommand(stream, COMMAND_DEL + " 2012-5-5");
-    RunCommand(stream, COMMAND_PRINT);
+    RunCommand(stream, "Add 0-1-2 event1");
+    RunCommand(stream, "Add 1-2-3 event2");
+    RunCommand(stream, "Find 0-1-2");
+    RunCommand(stream, "Del 0-1-2");
+    RunCommand(stream, "Print");
+    RunCommand(stream, "Del 1-2-3 event2");
+    RunCommand(stream, "Del 1-2-3 event2");
 
     RunInputStreamTests(db, stream);
 
