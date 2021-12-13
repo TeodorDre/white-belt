@@ -9,6 +9,7 @@
 #include "vector"
 #include "iomanip"
 #include "algorithm"
+#include "string"
 
 using namespace std;
 
@@ -21,15 +22,6 @@ string COMMAND_PRINT = "Print";
 
 void RunCommand(stringstream &stream, string command) {
     stream << command << endl;
-}
-
-bool check_number(const string& str) {
-    for (char i : str) {
-        if (isdigit(i) == false) {
-            return false;
-        }
-        return true;
-    }
 }
 
 class Date {
@@ -74,6 +66,8 @@ public:
 
     void static Validate(int y, int m, int d);
 
+    void static ValidateRaw(const string &date_raw);
+
 private:
     int year{};
     int month{};
@@ -89,6 +83,8 @@ istream &operator>>(istream &stream, Date &date) {
 
     if (stream.get() == '-') {
         stream.unget();
+    } else {
+        throw invalid_argument("Wrong date format: ");
     }
 
     if (!(stream.ignore(1))) {
@@ -101,6 +97,8 @@ istream &operator>>(istream &stream, Date &date) {
 
     if (stream.get() == '-') {
         stream.unget();
+    } else {
+        throw invalid_argument("Wrong date format: ");
     }
 
     if (!(stream.ignore(1))) {
@@ -134,6 +132,17 @@ void Date::Validate(int y, int m, int d) {
     if (is_invalid_day) {
         throw invalid_argument("Day value is invalid: " + to_string(d));
     }
+}
+
+void Date::ValidateRaw(const string &date_raw) {
+    stringstream stream;
+    stream << date_raw;
+
+    if (date_raw.empty()) {
+        return;
+    }
+
+    //
 }
 
 //#endregion
@@ -223,7 +232,7 @@ void Database::PrintAll() const {
 
         for (const string &event: events_set) {
             cout << setw(4) << setfill('0') << date.GetYear() << '-'
-            << setw(2) << setfill('0') << date.GetMonth() << '-' << setw(2) << date.GetDay();
+                 << setw(2) << setfill('0') << date.GetMonth() << '-' << setw(2) << date.GetDay();
             cout << " " << event << endl;
         }
     }
@@ -252,10 +261,18 @@ void ExecuteCommands(Database &db, istream &stream) {
 
         Date date;
 
+        stringstream date_raw_stream;
+
+        command_stream >> date_raw;
+        date_raw_stream << date_raw;
+
         try {
-            command_stream >> date;
+            Date::ValidateRaw(date_raw);
+
+            date_raw_stream >> date;
         } catch (const invalid_argument &error) {
-            cout << error.what();
+            cout << error.what() << endl;
+            continue;
         }
 
         command_stream.ignore(1);
@@ -283,21 +300,22 @@ void RunInputStreamTests() {
     Database db;
 
     stringstream stream;
-    RunCommand(stream, "Add 0-1-2 event1");
-    RunCommand(stream, "Add 1-2-3 event2");
-    RunCommand(stream, "Find 0-1-2");
-    RunCommand(stream, "Del 0-1-2");
-    RunCommand(stream, "Print");
-    RunCommand(stream, "Del 1-2-3 event2");
-    RunCommand(stream, "Del 1-2-3 event2");
+//    RunCommand(stream, "Add qwerty qwerty");
+//    RunCommand(stream, "Add 0-1-2 event1");
+//    RunCommand(stream, "Add 1-2-3 event2");
+//    RunCommand(stream, "Find 0-1-2");
+//    RunCommand(stream, "Del 0-1-2");
+//    RunCommand(stream, "Print");
+//    RunCommand(stream, "Del 1-2-3 event2");
+//    RunCommand(stream, "Del 1-2-3 event2");
 
-    string command;
+    RunCommand(stream, "Add 1 1 1 event");
 
     ExecuteCommands(db, stream);
 }
 
 int main() {
-    RunProduction(cin);
+    RunInputStreamTests();
 
     return 0;
 }
