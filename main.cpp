@@ -1,15 +1,12 @@
-//
-// Created by Andrew Slesarenko on 25.09.2021.
-//
-
-#include "iostream"
-#include "sstream"
-#include "map"
-#include "set"
-#include "vector"
-#include "iomanip"
-#include "algorithm"
-#include "string"
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <map>
+#include <set>
+#include <sstream>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -26,296 +23,213 @@ void RunCommand(stringstream &stream, string command) {
 
 class Date {
 public:
-    Date(int y, int m, int d) {
-        Date::Validate(y, m, d);
-
-        year = y;
-        month = m;
-        day = d;
-    }
-
-    Date() {}
-
-    void Init(int y, int m, int d) {
-        Date::Validate(y, m, d);
-
-        year = y;
-        month = m;
-        day = d;
+    Date(int c_year, int c_month, int c_day) {
+        year = abs(c_year);
+        if (c_month < 1 || c_month > 12) {
+            throw logic_error("Month value is invalid: " + to_string(c_month));
+        }
+        month = c_month;
+        if (c_day < 1 || c_day > 31) {
+            throw logic_error("Day value is invalid: " + to_string(c_day));
+        }
+        day = c_day;
     }
 
     int GetYear() const {
-        return this->year;
+        return year;
     }
 
     int GetMonth() const {
-        return this->month;
+        return month;
     }
 
     int GetDay() const {
-        return this->day;
+        return day;
     }
-
-    string GetFullDate() const {
-        return to_string(GetYear()) + to_string(GetMonth()) + to_string(GetDay());
-    }
-
-    bool operator<(const Date &date) const {
-        return GetFullDate() < date.GetFullDate();
-    }
-
-    void static Validate(int y, int m, int d);
-
-    void static ValidateRaw(const string &date_raw);
 
 private:
-    int year{};
-    int month{};
-    int day{};
+    int year = 0;
+    int month = 0;
+    int day = 0;
 };
 
-istream &operator>>(istream &stream, Date &date) {
-    int y, m, d;
-
-    if (!(stream >> y)) {
-        return stream;
-    }
-
-    if (stream.get() == '-') {
-        stream.unget();
-    } else {
-        throw invalid_argument("Wrong date format: ");
-    }
-
-    if (!(stream.ignore(1))) {
-        return stream;
-    }
-
-    if (!(stream >> m)) {
-        return stream;
-    }
-
-    if (stream.get() == '-') {
-        stream.unget();
-    } else {
-        throw invalid_argument("Wrong date format: ");
-    }
-
-    if (!(stream.ignore(1))) {
-        return stream;
-    }
-
-    if (!(stream >> d)) {
-        return stream;
-    }
-
-    date.Init(y, m, d);
-
-    return stream;
+bool operator<(const Date &d1, const Date &d2) {
+    return vector<int>{d1.GetYear(), d1.GetMonth(), d1.GetDay()} <
+           vector<int>{d2.GetYear(), d2.GetMonth(), d2.GetDay()};
 }
 
 ostream &operator<<(ostream &stream, const Date &date) {
-    stream << date.GetYear() << "-" << date.GetMonth() << "-" << date.GetDay();
-
+    stream << setw(4) << setfill('0') << date.GetYear() << "-"
+           << setw(2) << setfill('0') << date.GetMonth() << "-"
+           << setw(2) << setfill('0') << date.GetDay();
     return stream;
 }
 
-void Date::Validate(int y, int m, int d) {
-    bool is_invalid_month = m <= 0 || m >= 13;
 
-    if (is_invalid_month) {
-        throw invalid_argument("Month value is invalid: " + to_string(m));
+void EnsureNextCharAndSkip(stringstream &stream, const string &date) {
+    if (stream.peek() != '-') {
+        throw logic_error("Wrong date format: " + date);
     }
 
-    bool is_invalid_day = d <= 0 || d >= 32;
-
-    if (is_invalid_day) {
-        throw invalid_argument("Day value is invalid: " + to_string(d));
-    }
+    stream.ignore(1);
 }
 
-void Date::ValidateRaw(const string &date_raw) {
-    stringstream stream;
-    stream << date_raw;
+Date ParseDate(const string &date) {
+    stringstream date_stream(date);
 
-    if (date_raw.empty()) {
-        return;
+    int year, month, day;
+
+    date_stream >> year;
+
+    EnsureNextCharAndSkip(date_stream, date);
+
+    date_stream >> month;
+
+    EnsureNextCharAndSkip(date_stream, date);
+
+    date_stream >> day;
+
+    if (!date_stream.eof() || !date_stream) {
+        throw logic_error("Wrong date format: " + date);
     }
 
-    //
+    return {year, month, day};
 }
 
 //#endregion
-
-//#region DATABASE
 
 class Database {
-private:
-    map<Date, set<string>> records;
-
 public:
-    void Add(const Date &date, string &event);
+    void Add(const Date &date, const string &event) {
+        events[date].insert(event);
+    }
 
-    void Remove(const Date &date, string &event);
+    set<string> Find(const Date &date) const {
+        if (events.count(date) > 0) {
+            return events.at(date);
+        } else {
+            return {};
+        }
+    }
 
-    void Find(const Date &date);
+    bool Remove(const Date &date, const string &s) {
+        if (events.count(date) > 0 && events[date].count(s) > 0) {
+            events[date].erase(s);
+            return true;
+        }
+        return false;
+    }
 
-    void PrintAll() const;
+    int Remove(const Date &date) {
+        if (events.count(date) > 0) {
+            const unsigned int event_count = events[date].size();
+            events.erase(date);
+            return event_count;
+        }
+        return 0;
+    }
 
+    void PrintAll() const {
+        for (const auto &item : events) {
+            for (const auto &event : item.second) {
+                cout << item.first << " " << event << endl;
+            }
+        }
+    }
+
+private:
+    map<Date, set<string>> events;
 };
 
-void Database::Add(const Date &date, string &event) {
-    if (records.count(date) == 0) {
-        records[date] = {};
-    }
-
-    auto event_list = records.find(date);
-
-    if (event_list->second.count(event) == 0) {
-        event_list->second.insert(event);
-    }
-}
-
-void Database::Remove(const Date &date, string &event) {
-    bool has_event = !event.empty();
-
-    if (has_event) {
-        if (records.count(date) != 0) {
-            auto record_date = records.find(date);
-
-            if (record_date->second.count(event) != 0) {
-                record_date->second.erase(event);
-                cout << "Deleted successfully" << endl;
-            } else {
-                cout << "Event not found" << endl;
-            }
-        } else {
-            cout << "Event not found" << endl;
-        }
-    } else {
-        if (records.count(date) != 0) {
-            auto record_date = records.find(date);
-
-            int record_events_size = record_date->second.size();
-
-            record_date->second.clear();
-            cout << "Deleted " << record_events_size << " events" << endl;
-            return;
-        }
-
-        cout << "Event not found" << endl;
-    }
-}
-
-void Database::Find(const Date &date) {
-    auto record_date = records.find(date);
-
-    if (records.empty()) {
-        return;
-    }
-
-    auto events_set = record_date->second;
-
-    for (const auto &event: events_set) {
-        cout << event << endl;
-    }
-}
-
-void Database::PrintAll() const {
-    for (const auto &record: records) {
-        const Date &date = record.first;
-        auto &events_set = record.second;
-
-        if (events_set.empty()) {
-            continue;
-        }
-
-        for (const string &event: events_set) {
-            cout << setw(4) << setfill('0') << date.GetYear() << '-'
-                 << setw(2) << setfill('0') << date.GetMonth() << '-' << setw(2) << date.GetDay();
-            cout << " " << event << endl;
-        }
-    }
-}
-
-//#endregion
-
 void ExecuteCommands(Database &db, istream &stream) {
-    string command;
+    try {
+        string command_line;
 
-    while (getline(stream, command)) {
-        string command_name_raw;
-        string date_raw;
-        string event_name_raw;
+        while (getline(stream, command_line)) {
+            // Добавляем строчку из стрима в стрим строки
+            stringstream ss(command_line);
+            // строка команды
+            string command;
+            ss >> command;
 
-        stringstream command_stream;
-        command_stream << command;
+            // если пустая строка - пропускаем к следующей команде
+            if (command.empty()) {
+                continue;
+            } else if (command == COMMAND_ADD) {
+                string date, event;
+                ss >> date >> event;
+                // парсим дату из строки
+                const Date d = ParseDate(date);
+                db.Add(d, event);
+            } else if (command == COMMAND_DEL) {
+                string date, event;
+                ss >> date;
 
-        // Go to next line, if line is empty.
-        if (command_stream.eof()) {
-            continue;
+                // если не конец строки - парсим название события
+                if (!ss.eof()) {
+                    ss >> event;
+                }
+
+                const Date d = ParseDate(date);
+                // Если события не было - удаляем по дате всю дату
+                if (event.empty()) {
+                    cout << "Deleted " << db.Remove(d) << " events" << endl;
+                } else {
+                    // если было передано событие, удаляем событие, или говорим что удалять нечего
+                    if (db.Remove(d, event)) {
+                        cout << "Deleted successfully" << endl;
+                    } else {
+                        cout << "Event not found" << endl;
+                    }
+                }
+            } else if (command == COMMAND_FIND) {
+                string date;
+                ss >> date;
+                const Date d = ParseDate(date);
+                for (const auto &event : db.Find(d)) {
+                    cout << event << endl;
+                }
+            } else if (command == COMMAND_PRINT) {
+                db.PrintAll();
+            } else {
+                throw logic_error("Unknown command: " + command);
+            }
         }
-
-        command_stream >> command_name_raw;
-        command_stream.ignore(1);
-
-        Date date;
-
-        stringstream date_raw_stream;
-
-        command_stream >> date_raw;
-        date_raw_stream << date_raw;
-
-        try {
-            Date::ValidateRaw(date_raw);
-
-            date_raw_stream >> date;
-        } catch (const invalid_argument &error) {
-            cout << error.what() << endl;
-            continue;
-        }
-
-        command_stream.ignore(1);
-        command_stream >> event_name_raw;
-
-        if (command_name_raw == COMMAND_ADD) {
-            db.Add(date, event_name_raw);
-        } else if (command_name_raw == COMMAND_DEL) {
-            db.Remove(date, event_name_raw);
-        } else if (command_name_raw == COMMAND_FIND) {
-            db.Find(date);
-        } else if (command_name_raw == COMMAND_PRINT) {
-            db.PrintAll();
-        }
+    }
+    catch (const exception &e) {
+        cout << e.what() << endl;
     }
 }
 
-void RunProduction(istream &stream) {
+void RunProduction() {
     Database db;
 
-    ExecuteCommands(db, stream);
+    ExecuteCommands(db, cin);
 }
 
-void RunInputStreamTests() {
+void RunTest() {
     Database db;
 
     stringstream stream;
-//    RunCommand(stream, "Add qwerty qwerty");
-//    RunCommand(stream, "Add 0-1-2 event1");
-//    RunCommand(stream, "Add 1-2-3 event2");
-//    RunCommand(stream, "Find 0-1-2");
-//    RunCommand(stream, "Del 0-1-2");
-//    RunCommand(stream, "Print");
-//    RunCommand(stream, "Del 1-2-3 event2");
-//    RunCommand(stream, "Del 1-2-3 event2");
 
-    RunCommand(stream, "Add 1 1 1 event");
+    // RunCommand(stream, "Add 1-1-1 event1");
+    // RunCommand(stream, "Add qwerty qwerty");
+    RunCommand(stream, "Add 0-1-2 event1");
+    RunCommand(stream, "Add 1-2-3 event2");
+    RunCommand(stream, "Find 0-1-2");
+    // RunCommand(stream, "\t");
+    RunCommand(stream, "Del 0-1-2");
+    RunCommand(stream, "Print");
+    RunCommand(stream, "Del 1-2-3 event2");
+    RunCommand(stream, "Del 1-2-3 event2");
+    // RunCommand(stream, "Add qwerty qwerty");
+    // RunCommand(stream, "Add 1 1 1 event");
 
     ExecuteCommands(db, stream);
 }
 
 int main() {
-    RunInputStreamTests();
+    RunProduction();
 
     return 0;
 }
